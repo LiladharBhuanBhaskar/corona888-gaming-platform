@@ -17,33 +17,44 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _has_column(table: str, column: str) -> bool:
+    inspector = sa.inspect(op.get_bind())
+    if not inspector.has_table(table):
+        return False
+    return column in {c["name"] for c in inspector.get_columns(table)}
+
+
 def upgrade() -> None:
-    op.add_column(
-        "ludo_matches",
-        sa.Column(
-            "turn_started_at",
-            sa.DateTime(timezone=True),
-            nullable=True,
-        ),
-    )
+    if not _has_column("ludo_matches", "turn_started_at"):
+        op.add_column(
+            "ludo_matches",
+            sa.Column(
+                "turn_started_at",
+                sa.DateTime(timezone=True),
+                nullable=True,
+            ),
+        )
 
-    op.add_column(
-        "ludo_players",
-        sa.Column(
+    if not _has_column("ludo_players", "consecutive_timeouts"):
+        op.add_column(
+            "ludo_players",
+            sa.Column(
+                "consecutive_timeouts",
+                sa.Integer(),
+                nullable=False,
+                server_default="0",
+            ),
+        )
+        op.alter_column(
+            "ludo_players",
             "consecutive_timeouts",
-            sa.Integer(),
-            nullable=False,
-            server_default="0",
-        ),
-    )
-
-    op.alter_column(
-        "ludo_players",
-        "consecutive_timeouts",
-        server_default=None,
-    )
+            server_default=None,
+        )
 
 
 def downgrade() -> None:
-    op.drop_column("ludo_players", "consecutive_timeouts")
-    op.drop_column("ludo_matches", "turn_started_at")
+    if _has_column("ludo_players", "consecutive_timeouts"):
+        op.drop_column("ludo_players", "consecutive_timeouts")
+    if _has_column("ludo_matches", "turn_started_at"):
+        op.drop_column("ludo_matches", "turn_started_at")
+
