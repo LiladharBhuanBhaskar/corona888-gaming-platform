@@ -18,7 +18,11 @@ interface ChipData {
 }
 
 function paiseToRupees(p: number): string {
-  return (p / 100).toFixed(0);
+  const r = p / 100;
+  if (r >= 1000) {
+    return `${r / 1000}k`;
+  }
+  return r.toFixed(0);
 }
 
 export function ChipLayer({ bets }: ChipLayerProps) {

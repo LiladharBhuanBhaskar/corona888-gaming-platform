@@ -1273,6 +1273,11 @@ export function DragonTigerPage() {
                 p === 100000 ? 'from-orange-500 to-orange-700' :
                 'from-red-600 to-red-800';
 
+              const chipLabel =
+                p >= 100000 ? `${p / 100000}k` :
+                p >= 1000 ? `${p / 100}` :
+                `${p}`;
+
               return (
                 <button
                   key={p}
@@ -1285,7 +1290,7 @@ export function DragonTigerPage() {
                   }`}
                 >
                   <div className="absolute inset-[2px] sm:inset-[3px] rounded-full border-[1.5px] border-dashed border-white/35 pointer-events-none" />
-                  <span className="text-[10px] sm:text-[12px] md:text-sm drop-shadow-md">{p >= 1000 ? p / 100 : p}</span>
+                  <span className="text-[10px] sm:text-[12px] md:text-sm drop-shadow-md">{chipLabel}</span>
                 </button>
               );
             })}
